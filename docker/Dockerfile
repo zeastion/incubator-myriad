@@ -22,6 +22,8 @@
 FROM debian
 MAINTAINER Apache Myriad dev@myriad.incubator.apache.org
 
+ENV http_proxy=http://10.67.14.8:80/
+ENV https_proxy=http://10.67.14.8:80/
 ENV YARN_USER="yarn"
 ENV YARN_UID="108"
 ENV HADOOP_GROUP="hadoop"
@@ -32,7 +34,7 @@ ENV HADOOP_VER="2.7.0"
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV JAVA_HOME=/usr
 ENV MESOS_NATIVE_LIBRARY=/usr/local/lib/libmesos.so
-ENV MESOS_VER=0.28.1
+ENV MESOS_VER=1.0.0
 
 # Setup mesosphere repositories
 RUN apt-get -y update
@@ -45,13 +47,16 @@ RUN apt-get -y update
 RUN apt-get install -y mesos=`apt-cache madison mesos | grep $MESOS_VER | head -1 | awk {'print $3'}` curl tar
 # Run local YARN install
 ADD myriad-bin/install-yarn.sh /install-yarn.sh
+RUN chmod 777 /install-yarn.sh
 RUN sh /install-yarn.sh
 ADD myriad-bin/configure-yarn.sh /configure-yarn.sh
+RUN chmod 777 /configure-yarn.sh
 RUN /configure-yarn.sh
 # Copy over myriad libraries
 ADD ./libs/* /usr/local/hadoop/share/hadoop/yarn/lib/
 # Initialize hadoop confs with env vars
 ADD myriad-etc/* /usr/local/hadoop/etc/hadoop/
 RUN chown -R root:root /usr/local/hadoop/etc
-USER yarn
-CMD /usr/local/hadoop/bin/yarn resourcemanager
+#USER yarn
+USER root
+CMD export MESOS_NATIVE_LIBRARY=/usr/local/lib/libmesos.so && /usr/local/hadoop/bin/yarn resourcemanager
