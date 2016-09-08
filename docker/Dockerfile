@@ -57,5 +57,6 @@ ADD ./libs/* /usr/local/hadoop/share/hadoop/yarn/lib/
 # Initialize hadoop confs with env vars
 ADD myriad-etc/* /usr/local/hadoop/etc/hadoop/
 RUN chown -R root:root /usr/local/hadoop/etc
-USER yarn
+#USER yarn
+USER root
 CMD export MESOS_NATIVE_LIBRARY=/usr/local/lib/libmesos.so && /usr/local/hadoop/bin/yarn resourcemanager
