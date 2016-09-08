@@ -1,0 +1,72 @@
+##
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+##
+mesosMaster: zk://hdms01:2181,hdms02:2181,hdms03:2181/mesos
+checkpoint: false
+frameworkFailoverTimeout: 60000
+frameworkName: MyriadAlpha
+#frameworkRole: 
+frameworkUser: root     # User the Node Manager runs as, required if nodeManagerURI set, otherwise defaults to the user
+                          # running the resource manager.
+frameworkSuperUser: root  # To be depricated, currently permissions need set by a superuser due to Mesos-1790.  Must be
+                          # root or have passwordless sudo. Required if nodeManagerURI set, ignored otherwise.
+#nativeLibrary: /usr/local/lib/libmesos.so
+zkServers: hdms01:2181,hdms02:2181,hdms03:2181
+zkTimeout: 20000
+restApiPort: 8192
+#servedConfigPath: dist/config.tgz
+#servedBinaryPath: dist/hadoop-2.6.0.tgz
+profiles:
+  zero:  # NMs launched with this profile dynamically obtain cpu/mem from Mesos
+    cpu: 0
+    mem: 0
+  small:
+    cpu: 1 
+    mem: 1024
+  medium:
+    cpu: 2
+    mem: 2048
+  large:
+    cpu: 10
+    mem: 12288
+nmInstances: # NMs to start with. Requires at least 1 NM with a non-zero profile.
+  medium: 1 # <profile_name : instances>
+rebalancer: false
+haEnabled: false
+nodemanager:
+  jvmMaxMemoryMB: 1024
+  cpus: 0.5
+  cgroups: false
+executor:
+  jvmMaxMemoryMB: 512
+  #path: file:///usr/local/libexec/mesos/myriad-executor-runnable-0.1.0.jar
+  #The following should be used for a remotely distributed URI, hdfs assumed but other URI types valid.
+  nodeManagerUri: http://192.168.0.153:8765/binary.tgz
+  configUri: http://192.168.0.153:8765/config.tgz
+  #jvmUri: https://downloads.mycompany.com/java/jre-7u76-linux-x64.tar.gz
+yarnEnvironment:
+  #YARN_HOME: /opt/mesosphere/hdfs
+  JAVA_HOME: /usr
+  #HADOOP_CONF_DIR=config
+  #HADOOP_TMP_DIR=$MESOS_SANDBOX
+  YARN_HOME: hadoop-2.7.0 #this should be relative if nodeManagerUri is set
+  #JAVA_HOME: /usr/lib/jvm/java-default #System dependent, but sometimes necessary
+  #JAVA_HOME: jre1.7.0_76 # Path to JRE distribution, relative to sandbox directory
+  #JAVA_LIBRARY_PATH: /opt/mycompany/lib
+#mesosAuthenticationPrincipal:
+#mesosAuthenticationSecretFilename:
